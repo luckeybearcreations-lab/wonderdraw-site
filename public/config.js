@@ -6,9 +6,9 @@
 window.WONDERDRAW = {
   contactEmail: "hello@wonderdraw.net",
   packages: {
-    spark: { price: "", link: "" },
-    reveal: { price: "", link: "" },
-    bundle: { price: "", link: "" },
+    spark: { price: "$24", link: "" },
+    reveal: { price: "$49", link: "" },
+    bundle: { price: "$79", link: "" },
     club: { price: "$12/month", link: "" },
   },
 };
