@@ -11,7 +11,7 @@ test("every page has a title, description and canonical URL", async () => {
     const html = await read(file);
     assert.match(html, /<title>[^<]+<\/title>/, file);
     assert.match(html, /<meta name="description" content="[^"]+">/, file);
-    assert.match(html, /<link rel="canonical" href="https:\/\/wonderdraw\.net\/[^"]*">/, file);
+    assert.match(html, /<link rel="canonical" href="https:\/\/(wonderdraw\.net|wonderdraw\.shopluckybears\.com)\/[^"]*">/, file);
   }
 });
 
