@@ -1,0 +1,14 @@
+{
+  "name": "wonderdraw-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "wonderdraw.net: static site served by a Cloudflare Worker, checkout through Stripe Payment Links.",
+  "scripts": {
+    "test": "node --test tests/site.test.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.92.0"
+  }
+}
