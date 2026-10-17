@@ -35,6 +35,7 @@ export default {
       if (path === "/admin/approve") return await adminApprove(url, env);
       if (path === "/admin/redo") return await adminRedo(request, url, env);
       if (path === "/admin/notify") return await adminNotify(url, env);
+      if (path === "/admin/review") return await adminReview(url, env);
       if (path === "/admin/email-status") return await emailStatus(url, env);
       if (path.startsWith("/proof/")) return await proof(request, url, env);
       if (path.startsWith("/final/")) return await finalPage(url, env);
@@ -170,18 +171,36 @@ async function replicateDone(request, url, env) {
 // ---------- Gus (admin) ----------
 
 async function sendReviewEmail(env, order) {
-  const t = await sign(env, "media", order.id);
-  const drawing = `${env.SITE_URL}/media/${order.id}/drawing?t=${t}`;
-  const art = `${env.SITE_URL}/media/${order.id}/art-${order.round}?t=${t}`;
-  const approve = await adminLink(env, "approve", order.id);
-  const redo = await adminLink(env, "redo", order.id);
+  // Kept plain on purpose: Gmail silently dropped an earlier version with inline images
+  // and a big "Approve" button. One link to a review page is enough.
+  const review = await adminLink(env, "review", order.id);
   const last = order.notes[order.notes.length - 1];
-  return sendEmail(env, env.ADMIN_EMAIL, `WonderDraw: approve art for ${order.name || order.email} (${order.pkg.name})`,
-    `New art is ready for review.\n\nCustomer: ${order.name} <${order.email}>\nPackage: ${order.pkg.name}\nStyle: ${order.style}\nStory: ${order.story || "-"}\n${last ? `Latest change request: ${last}\n` : ""}\nDrawing: ${drawing}\nArt: ${art}\n\nApprove and send the proof: ${approve}\nRedo it: ${redo}`,
-    `<p>New art is ready for review.</p><p><b>${esc(order.name)}</b> &lt;${esc(order.email)}&gt;<br>${esc(order.pkg.name)} · ${esc(order.style)}<br>Story: ${esc(order.story || "-")}${last ? `<br>Latest change request: ${esc(last)}` : ""}</p>
-     <table><tr><td><img src="${drawing}" width="260" alt="Original drawing"></td><td><img src="${art}" width="260" alt="New art"></td></tr></table>
-     <p><a href="${approve}" style="background:#5b3fd6;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Approve &amp; send proof</a>
-     &nbsp; <a href="${redo}">Redo it</a></p>`);
+  return sendEmail(env, env.ADMIN_EMAIL, `New WonderDraw order from ${order.name || order.email}`,
+    `A new ${order.pkg.name} order is ready for you to check.
+
+Customer: ${order.name} (${order.email})
+Style: ${order.style}
+Story: ${order.story || "-"}
+${last ? `Change request: ${last}
+` : ""}
+See the drawing and the art here: ${review}`,
+    `<p>A new ${esc(order.pkg.name)} order is ready for you to check.</p><p>Customer: ${esc(order.name)} (${esc(order.email)})<br>Style: ${esc(order.style)}<br>Story: ${esc(order.story || "-")}${last ? `<br>Change request: ${esc(last)}` : ""}</p><p><a href="${review}">See the drawing and the art</a></p>`);
+}
+
+// Gus's review page: drawing, art, and the Approve / Redo buttons.
+async function adminReview(url, env) {
+  const id = url.searchParams.get("order");
+  if (!(await verify(env, "admin-review", id, url.searchParams.get("t")))) return page("Link expired", "<p>This link isn't valid.</p>", 403);
+  const order = await loadOrder(env, id);
+  if (!order) return page("Not found", "<p>That order doesn't exist.</p>", 404);
+  const mt = await sign(env, "media", id);
+  const status = order.status === "review" ? "" : `<p class="form-note">This order is already <b>${esc(order.status)}</b>.</p>`;
+  return page(`Review: ${order.name || order.email}`, `${status}
+    <p>${esc(order.pkg.name)} · ${esc(order.style)}<br>Story: ${esc(order.story || "-")}</p>
+    <div class="cards two"><div class="card"><b>Drawing</b><img src="/media/${id}/drawing?t=${mt}" alt="Original drawing"></div>
+    <div class="card"><b>Art</b><img src="/media/${id}/art-${order.round}?t=${mt}" alt="New art"></div></div>
+    <p class="cta-row"><a class="btn btn-primary" href="${await adminLink(env, "approve", id)}">Approve &amp; send proof</a>
+    <a class="btn btn-ghost" href="${await adminLink(env, "redo", id)}">Redo it</a></p>`);
 }
 
 // Re-sends the review email (used if the first one went missing) and shows what Resend said.

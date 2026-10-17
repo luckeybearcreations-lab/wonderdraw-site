@@ -99,7 +99,9 @@ test("full order: upload, AI art, Gus approves, customer approves", async () => 
   assert.equal(done.status, 200);
   const review = env.mail.at(-1);
   assert.equal(review.to, "gus@test");
-  const approve = review.text.match(/Approve and send the proof: (\S+)/)[1];
+  const reviewUrl = review.text.match(/See the drawing and the art here: (\S+)/)[1];
+  const reviewPage = await (await worker.fetch(new Request(reviewUrl), env, ctx())).text();
+  const approve = reviewPage.match(/href="(https:\/\/wd\.test\/admin\/approve[^"]+)"/)[1].replace(/&amp;/g, "&");
 
   // Gus approves -> customer gets the proof link
   await worker.fetch(new Request(approve), env, ctx());
