@@ -34,6 +34,8 @@ export default {
       if (path.startsWith("/media/")) return await media(url, env);
       if (path === "/admin/approve") return await adminApprove(url, env);
       if (path === "/admin/redo") return await adminRedo(request, url, env);
+      if (path === "/admin/notify") return await adminNotify(url, env);
+      if (path === "/admin/email-status") return await emailStatus(url, env);
       if (path.startsWith("/proof/")) return await proof(request, url, env);
       if (path.startsWith("/final/")) return await finalPage(url, env);
     } catch (err) {
@@ -161,22 +163,36 @@ async function replicateDone(request, url, env) {
   order.status = "review";
   await saveOrder(env, order);
 
+  await sendReviewEmail(env, order);
+  return new Response("ok");
+}
+
+// ---------- Gus (admin) ----------
+
+async function sendReviewEmail(env, order) {
   const t = await sign(env, "media", order.id);
   const drawing = `${env.SITE_URL}/media/${order.id}/drawing?t=${t}`;
   const art = `${env.SITE_URL}/media/${order.id}/art-${order.round}?t=${t}`;
   const approve = await adminLink(env, "approve", order.id);
   const redo = await adminLink(env, "redo", order.id);
   const last = order.notes[order.notes.length - 1];
-  await sendEmail(env, env.ADMIN_EMAIL, `WonderDraw: approve art for ${order.name || order.email} (${order.pkg.name})`,
+  return sendEmail(env, env.ADMIN_EMAIL, `WonderDraw: approve art for ${order.name || order.email} (${order.pkg.name})`,
     `New art is ready for review.\n\nCustomer: ${order.name} <${order.email}>\nPackage: ${order.pkg.name}\nStyle: ${order.style}\nStory: ${order.story || "-"}\n${last ? `Latest change request: ${last}\n` : ""}\nDrawing: ${drawing}\nArt: ${art}\n\nApprove and send the proof: ${approve}\nRedo it: ${redo}`,
     `<p>New art is ready for review.</p><p><b>${esc(order.name)}</b> &lt;${esc(order.email)}&gt;<br>${esc(order.pkg.name)} · ${esc(order.style)}<br>Story: ${esc(order.story || "-")}${last ? `<br>Latest change request: ${esc(last)}` : ""}</p>
      <table><tr><td><img src="${drawing}" width="260" alt="Original drawing"></td><td><img src="${art}" width="260" alt="New art"></td></tr></table>
      <p><a href="${approve}" style="background:#5b3fd6;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Approve &amp; send proof</a>
      &nbsp; <a href="${redo}">Redo it</a></p>`);
-  return new Response("ok");
 }
 
-// ---------- Gus (admin) ----------
+// Re-sends the review email (used if the first one went missing) and shows what Resend said.
+async function adminNotify(url, env) {
+  const id = url.searchParams.get("order");
+  if (!(await verify(env, "admin-notify", id, url.searchParams.get("t")))) return json({ ok: false }, 403);
+  const order = await loadOrder(env, id);
+  if (!order || order.status !== "review") return json({ ok: false, status: order?.status || "missing" }, 404);
+  return json(await sendReviewEmail(env, order));
+}
+
 
 async function adminLink(env, action, id) {
   return `${env.SITE_URL}/admin/${action}?order=${id}&t=${await sign(env, `admin-${action}`, id)}`;
@@ -217,6 +233,14 @@ async function adminRedo(request, url, env) {
     <label>What should change? (optional)<br><textarea name="note" rows="4" maxlength="400"></textarea></label>
     <label>Style<br><select name="style">${options}</select></label>
     <button class="btn btn-primary" type="submit">Make a new version</button></form>`);
+}
+
+// Shows Resend's delivery status for one email id (for troubleshooting).
+async function emailStatus(url, env) {
+  const id = url.searchParams.get("id") || "";
+  if (!(await verify(env, "admin-status", id, url.searchParams.get("t")))) return json({ ok: false }, 403);
+  const res = await fetch(`https://api.resend.com/emails/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${env.RESEND_API_KEY}` } });
+  return new Response(await res.text(), { status: res.status, headers: { "Content-Type": "application/json" } });
 }
 
 // ---------- Customer proof + final ----------
@@ -323,7 +347,7 @@ async function saveOrder(env, order) {
 
 // Email goes out through Resend (free tier). shopluckybears.com is verified there.
 async function sendEmail(env, to, subject, text, html) {
-  if (!to) return;
+  if (!to) return { ok: false, error: "no recipient" };
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -337,9 +361,13 @@ async function sendEmail(env, to, subject, text, html) {
         html: html || `<pre style="font-family:inherit;white-space:pre-wrap">${esc(text)}</pre>`,
       }),
     });
-    if (!res.ok) console.error("email failed", res.status, await res.text());
+    const body = await res.text();
+    if (!res.ok) console.error("email failed", res.status, body);
+    else console.log("email sent", to, body);
+    return { ok: res.ok, status: res.status, body };
   } catch (err) {
     console.error("email failed", err.message);
+    return { ok: false, error: err.message };
   }
 }
 
