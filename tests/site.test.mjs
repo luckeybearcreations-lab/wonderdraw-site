@@ -55,3 +55,11 @@ test("Stripe links in config are real Payment Links when set", async () => {
     if (link) assert.match(link, /^https:\/\/(buy|checkout)\.stripe\.com\//);
   }
 });
+
+test("every page links back to Gus' card with the home badge", async () => {
+  await access(new URL("home-badge.webp", pub));
+  for (const file of pages) {
+    const html = await read(file);
+    assert.match(html, /<a class="gus-home-badge" href="https:\/\/www\.shopluckybears\.com\/gus" aria-label="Back to Gus' card" title="Back to Gus' card"><img src="\/home-badge\.webp" alt=""/, file);
+  }
+});

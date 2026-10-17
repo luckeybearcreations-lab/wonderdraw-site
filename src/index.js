@@ -430,6 +430,6 @@ function page(title, body, status = 200) {
 <title>${esc(title)} | WonderDraw</title><meta name="robots" content="noindex, nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head>
 <body><header class="site-header"><a class="brand" href="/"><img src="/images/logo.jpg" alt="Luckey Bear Creations" width="48" height="42"><span>WonderDraw</span></a></header>
 <main><section class="section narrow"><h1>${esc(title)}</h1>${body}</section></main>
-<footer class="site-footer"><p class="fine">&copy; Luckey Bear Creations LLC · <a href="/contact">Contact</a></p></footer></body></html>`,
+<footer class="site-footer"><p class="fine">&copy; Luckey Bear Creations LLC · <a href="/contact">Contact</a></p></footer><a class="gus-home-badge" href="https://www.shopluckybears.com/gus" aria-label="Back to Gus' card" title="Back to Gus' card"><img src="/home-badge.webp" alt="" width="52" height="52" decoding="async"><span class="gus-home-badge-label" aria-hidden="true">Gus' card</span></a></body></html>`,
     { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
 }
