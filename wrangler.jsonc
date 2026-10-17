@@ -17,8 +17,6 @@
   // Orders (KV) and uploaded drawings / finished art (R2).
   "kv_namespaces": [{ "binding": "ORDERS", "id": "e8276ca1adc248d48237ecb9219b7875" }],
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "wonderdraw-orders" }],
-  // Cloudflare Email Service. shopluckybears.com must have Email Sending turned on.
-  "send_email": [{ "name": "EMAIL" }],
 
   "vars": {
     "SITE_URL": "https://wonderdraw.shopluckybears.com",
@@ -31,4 +29,5 @@
   //   STRIPE_SECRET_KEY    restricted key with read access to Checkout Sessions
   //   REPLICATE_API_TOKEN  from replicate.com/account/api-tokens
   //   LINK_SECRET          any long random string; signs the private links in emails
+  //   RESEND_API_KEY       from resend.com/api-keys (sending access, shopluckybears.com)
 }

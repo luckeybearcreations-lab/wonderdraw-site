@@ -2,7 +2,7 @@
 // Static pages come from ./public (env.ASSETS). This Worker adds the order flow:
 //   Stripe checkout -> /thanks upload -> Replicate makes the art -> Gus approves by email
 //   -> customer gets a private proof -> customer approves -> final files.
-// Orders live in KV (ORDERS), images in R2 (FILES), email goes out through EMAIL.
+// Orders live in KV (ORDERS), images in R2 (FILES), email goes out through Resend.
 
 // Only checkouts from WonderDraw's own Stripe Payment Links can upload a drawing.
 // (The Stripe account also sells Lucky Bear Tap, Fluid Pour, etc.)
@@ -321,19 +321,25 @@ async function saveOrder(env, order) {
   await env.ORDERS.put(`order:${order.id}`, JSON.stringify(order));
 }
 
+// Email goes out through Resend (free tier). shopluckybears.com is verified there.
 async function sendEmail(env, to, subject, text, html) {
   if (!to) return;
   try {
-    await env.EMAIL.send({
-      from: { email: env.FROM_EMAIL, name: "WonderDraw" },
-      replyTo: env.REPLY_TO,
-      to,
-      subject,
-      text,
-      html: html || `<pre style="font-family:inherit;white-space:pre-wrap">${esc(text)}</pre>`,
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: `WonderDraw <${env.FROM_EMAIL}>`,
+        reply_to: env.REPLY_TO,
+        to: [to],
+        subject,
+        text,
+        html: html || `<pre style="font-family:inherit;white-space:pre-wrap">${esc(text)}</pre>`,
+      }),
     });
+    if (!res.ok) console.error("email failed", res.status, await res.text());
   } catch (err) {
-    console.error("email failed", err.code, err.message);
+    console.error("email failed", err.message);
   }
 }
 

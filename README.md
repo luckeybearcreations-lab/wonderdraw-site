@@ -35,8 +35,8 @@ R2 `wonderdraw-orders`.
 1. `npx wrangler secret put STRIPE_SECRET_KEY` (restricted key, Checkout Sessions: read)
 2. `npx wrangler secret put REPLICATE_API_TOKEN`
 3. `npx wrangler secret put LINK_SECRET` (any long random string)
-4. Turn on Email Sending for shopluckybears.com:
-   `npx wrangler email sending enable shopluckybears.com`
+4. Verify shopluckybears.com in Resend (resend.com/domains, auto-configure with
+   Cloudflare), make a sending-only API key, and save it as the `RESEND_API_KEY` secret
 5. In Stripe, set each Payment Link's after-payment redirect to
    `https://wonderdraw.shopluckybears.com/thanks?session_id={CHECKOUT_SESSION_ID}`
 6. `npm run deploy`

@@ -30,13 +30,20 @@ function fakeEnv() {
         return f && { body: f.body, writeHttpMetadata: (h) => h.set("Content-Type", f.type) };
       },
     },
-    EMAIL: { send: async (m) => void mail.push(m) },
+    RESEND_API_KEY: "re_test",
   };
 }
 
-function stubFetch(predictions) {
+let mailbox = [];
+function stubFetch(predictions, env) {
+  mailbox = env ? env.mail : [];
   globalThis.fetch = async (url, init = {}) => {
     url = String(url);
+    if (url === "https://api.resend.com/emails") {
+      const m = JSON.parse(init.body);
+      mailbox.push({ ...m, to: m.to[0] });
+      return Response.json({ id: "e1" });
+    }
     if (url.startsWith("https://api.stripe.com/v1/checkout/sessions/cs_paid")) {
       return Response.json({ id: "cs_paid", payment_status: "paid", payment_link: "plink_1UQjJdK5pTjjyr2KFGhdcSj5", customer_details: { email: "mom@test", name: "Pat Lee" } });
     }
@@ -71,7 +78,7 @@ function upload(session) {
 test("full order: upload, AI art, Gus approves, customer approves", async () => {
   const env = fakeEnv();
   const predictions = [];
-  stubFetch(predictions);
+  stubFetch(predictions, env);
 
   const c = ctx();
   const res = await worker.fetch(upload("cs_paid"), env, c);
@@ -115,7 +122,7 @@ test("full order: upload, AI art, Gus approves, customer approves", async () => 
 
 test("unpaid checkout and bad links are rejected", async () => {
   const env = fakeEnv();
-  stubFetch([]);
+  stubFetch([], env);
   assert.equal((await worker.fetch(upload("cs_unpaid"), env, ctx())).status, 400);
   assert.equal((await worker.fetch(upload("cs_other"), env, ctx())).status, 400, "non-WonderDraw purchase");
   assert.equal((await worker.fetch(new Request("https://wd.test/admin/approve?order=0123456789abcdef&t=bad"), env, ctx())).status, 403);
