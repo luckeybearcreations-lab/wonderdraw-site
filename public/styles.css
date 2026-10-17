@@ -90,3 +90,17 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.2rem); }
   .hero { grid-template-columns: 1fr; }
   .hero-art { order: -1; max-width: 420px; }
 }
+
+/* Order upload, proof and final pages */
+.stack { display: grid; gap: 14px; margin: 18px 0; }
+.stack input[type=text], .stack textarea, .stack select, .stack input[type=file] { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #fff; }
+.stack .check { display: flex; gap: 10px; align-items: flex-start; }
+.form-note { color: var(--muted); font-size: .95rem; }
+.form-error { color: #b42318; font-weight: 700; }
+.reveal { position: relative; margin: 20px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #fff; user-select: none; }
+.reveal > img { display: block; width: 100%; }
+.reveal-before { position: absolute; inset: 0; background: #fff; }
+.reveal-before img { width: 100%; height: 100%; object-fit: contain; }
+.reveal input[type=range] { position: absolute; left: 4%; right: 4%; bottom: 14px; width: 92%; }
+.reveal.watermarked::after { content: "WONDERDRAW PROOF  ·  WONDERDRAW PROOF  ·  WONDERDRAW PROOF"; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: clamp(1rem, 4vw, 2rem); color: rgba(255,255,255,.55); text-shadow: 0 0 4px rgba(0,0,0,.35); transform: rotate(-24deg); pointer-events: none; white-space: nowrap; }
+details summary { list-style: none; display: inline-block; }

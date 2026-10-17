@@ -15,11 +15,33 @@ Spark Sketch, Magic Reveal and Big Imagination Bundle, and a $12/month recurring
 Little Artist Club. Under **After payment**, choose "Don't show confirmation page" and
 redirect to `https://wonderdraw.net/thanks`.
 
-## Orders
+## Orders (automatic)
 
-After paying, the customer replies to their Stripe receipt with the drawing photo (the
-`/thanks` page tells them how). Set Stripe → Settings → Public details → Support email
-to the inbox you read, so those replies reach you.
+1. Each Stripe Payment Link redirects to `/thanks?session_id={CHECKOUT_SESSION_ID}`.
+2. `/thanks` checks the order is paid and shows an upload form (photo, style, story,
+   guardian consent). Without a session id it falls back to "reply to your receipt".
+3. The drawing goes to R2 and Replicate (`REPLICATE_MODEL`) makes the art.
+4. Gus gets an email with the drawing, the art and **Approve** / **Redo** buttons.
+5. Approve emails the customer a private, watermarked proof page with a before/after
+   slider. They approve (final download page + reveal video) or ask for changes, up to
+   the package's revision rounds (Spark 0, Magic Reveal 1, Bundle 2).
+
+Code: `src/index.js` (Worker), `public/order.js` (upload form), `public/reveal.js`
+(slider and browser-made reveal video). Orders are in KV `wonderdraw-orders`, files in
+R2 `wonderdraw-orders`.
+
+### Turning it on
+
+1. `npx wrangler secret put STRIPE_SECRET_KEY` (restricted key, Checkout Sessions: read)
+2. `npx wrangler secret put REPLICATE_API_TOKEN`
+3. `npx wrangler secret put LINK_SECRET` (any long random string)
+4. Turn on Email Sending for shopluckybears.com:
+   `npx wrangler email sending enable shopluckybears.com`
+5. In Stripe, set each Payment Link's after-payment redirect to
+   `https://wonderdraw.shopluckybears.com/thanks?session_id={CHECKOUT_SESSION_ID}`
+6. `npm run deploy`
+
+Little Artist Club renewals don't get a new upload link yet; handle those by email.
 
 ## Contact email
 

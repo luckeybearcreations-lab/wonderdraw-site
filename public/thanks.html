@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/styles.css">
   <script src="/config.js" defer></script>
   <script src="/site.js" defer></script>
+  <script src="/order.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -29,7 +30,30 @@
     </nav>
   </header>
   <main>
-    <section class="section narrow">
+    <section class="section narrow" data-upload hidden>
+      <h1>Thank you! Now send us the drawing.</h1>
+      <p class="lead">Your <b data-package>order</b> is paid. Add a photo of the drawing below and we'll start right away.</p>
+      <form class="stack" data-upload-form>
+        <label>Photo of the drawing<br><input type="file" name="photo" accept="image/*" required></label>
+        <p class="form-note">Lay it flat in good light and fill the frame. JPG, PNG or HEIC up to 15 MB.</p>
+        <label>Art style<br><select name="style">
+          <option value="storybook">Storybook illustration</option>
+          <option value="watercolor">Watercolor painting</option>
+          <option value="cartoon3d">3D animated movie</option>
+          <option value="papercut">Paper cutout collage</option>
+        </select></label>
+        <label>What does the drawing show? (optional)<br><textarea name="story" rows="3" maxlength="600" placeholder="It's our dog Max flying over Grandma's house"></textarea></label>
+        <label data-scene hidden>Background scene you'd like (optional)<br><input type="text" name="scene" maxlength="300" placeholder="A starry night sky over the ocean"></label>
+        <label class="check"><input type="checkbox" name="consent" value="yes" required> <span>I'm the child's parent or guardian and agree to the <a href="/privacy-consent">privacy &amp; consent terms</a>.</span></label>
+        <p class="form-error" data-error hidden></p>
+        <button class="btn btn-primary" type="submit">Send my drawing</button>
+      </form>
+    </section>
+    <section class="section narrow" data-upload-done hidden>
+      <h1>Got it! Your art is being made.</h1>
+      <p class="lead">We'll email your private proof within 5 business days, usually much sooner.</p>
+    </section>
+    <section class="section narrow" data-fallback>
       <h1>Thank you! Next, send us the drawing.</h1>
       <ol>
         <li>Find your receipt email from Stripe.</li>
