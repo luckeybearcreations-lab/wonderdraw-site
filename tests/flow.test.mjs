@@ -38,7 +38,10 @@ function stubFetch(predictions) {
   globalThis.fetch = async (url, init = {}) => {
     url = String(url);
     if (url.startsWith("https://api.stripe.com/v1/checkout/sessions/cs_paid")) {
-      return Response.json({ id: "cs_paid", payment_status: "paid", amount_total: 4900, customer_details: { email: "mom@test", name: "Pat Lee" } });
+      return Response.json({ id: "cs_paid", payment_status: "paid", payment_link: "plink_1UQjJdK5pTjjyr2KFGhdcSj5", customer_details: { email: "mom@test", name: "Pat Lee" } });
+    }
+    if (url.startsWith("https://api.stripe.com/v1/checkout/sessions/cs_other")) {
+      return Response.json({ id: "cs_other", payment_status: "paid", payment_link: "plink_somethingelse", customer_details: { email: "x@test" } });
     }
     if (url.startsWith("https://api.stripe.com/")) return Response.json({ payment_status: "unpaid" });
     if (url.startsWith("https://api.replicate.com/")) {
@@ -114,6 +117,7 @@ test("unpaid checkout and bad links are rejected", async () => {
   const env = fakeEnv();
   stubFetch([]);
   assert.equal((await worker.fetch(upload("cs_unpaid"), env, ctx())).status, 400);
+  assert.equal((await worker.fetch(upload("cs_other"), env, ctx())).status, 400, "non-WonderDraw purchase");
   assert.equal((await worker.fetch(new Request("https://wd.test/admin/approve?order=0123456789abcdef&t=bad"), env, ctx())).status, 403);
   assert.equal((await worker.fetch(new Request("https://wd.test/media/0123456789abcdef/drawing?t=bad"), env, ctx())).status, 403);
   assert.equal(await (await worker.fetch(new Request("https://wd.test/"), env, ctx())).text(), "asset");

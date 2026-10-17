@@ -4,11 +4,13 @@
 //   -> customer gets a private proof -> customer approves -> final files.
 // Orders live in KV (ORDERS), images in R2 (FILES), email goes out through EMAIL.
 
-const PACKAGES = {
-  2400: { key: "spark", name: "Spark Sketch", revisions: 0 },
-  4900: { key: "reveal", name: "Magic Reveal", revisions: 1 },
-  7900: { key: "bundle", name: "Big Imagination Bundle", revisions: 2 },
-  1200: { key: "club", name: "Little Artist Club", revisions: 1 },
+// Only checkouts from WonderDraw's own Stripe Payment Links can upload a drawing.
+// (The Stripe account also sells Lucky Bear Tap, Fluid Pour, etc.)
+export const PACKAGES = {
+  plink_1UQjJNK5pTjjyr2KnCmamdKW: { key: "spark", name: "Spark Sketch", revisions: 0 },
+  plink_1UQjJdK5pTjjyr2KFGhdcSj5: { key: "reveal", name: "Magic Reveal", revisions: 1 },
+  plink_1UQjJyK5pTjjyr2K3FfN76N4: { key: "bundle", name: "Big Imagination Bundle", revisions: 2 },
+  plink_1UQjKHK5pTjjyr2K9yrToT17: { key: "club", name: "Little Artist Club", revisions: 1 },
 };
 
 export const STYLES = {
@@ -52,8 +54,8 @@ async function stripeSession(env, sessionId) {
   if (!res.ok) return null;
   const s = await res.json();
   const paid = s.payment_status === "paid" || (s.mode === "subscription" && s.status === "complete");
-  if (!paid) return null;
-  const pkg = PACKAGES[s.amount_total] || { key: "custom", name: "WonderDraw order", revisions: 1 };
+  const pkg = PACKAGES[s.payment_link];
+  if (!paid || !pkg) return null;
   return {
     id: s.id,
     email: s.customer_details?.email || s.customer_email || "",
