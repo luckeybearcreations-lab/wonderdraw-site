@@ -1,13 +1,33 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wonderdraw",
+  "main": "src/index.js",
   "compatibility_date": "2026-05-01",
   "assets": {
     "directory": "./public",
+    "binding": "ASSETS",
     "html_handling": "drop-trailing-slash",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*", "/media/*", "/admin/*", "/proof/*", "/final/*"]
   },
-  "routes": [{ "pattern": "wonderdraw.shopluckybears.com", "custom_domain": true }]
+  "routes": [{ "pattern": "wonderdraw.shopluckybears.com", "custom_domain": true }],
   // After wonderdraw.net is on Cloudflare, attach it under
-  // Workers & Pages → wonderdraw → Settings → Domains & Routes.
+  // Workers & Pages → wonderdraw → Settings → Domains & Routes, and change SITE_URL.
+
+  // Orders (KV) and uploaded drawings / finished art (R2).
+  "kv_namespaces": [{ "binding": "ORDERS", "id": "e8276ca1adc248d48237ecb9219b7875" }],
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "wonderdraw-orders" }],
+
+  "vars": {
+    "SITE_URL": "https://wonderdraw.shopluckybears.com",
+    "ADMIN_EMAIL": "luckeybearcreations@gmail.com",
+    "FROM_EMAIL": "wonderdraw@shopluckybears.com",
+    "REPLY_TO": "hello@shopluckybears.com",
+    "REPLICATE_MODEL": "black-forest-labs/flux-kontext-pro"
+  }
+  // Secrets (set with `npx wrangler secret put NAME`, never commit them):
+  //   STRIPE_SECRET_KEY    restricted key with read access to Checkout Sessions
+  //   REPLICATE_API_TOKEN  from replicate.com/account/api-tokens
+  //   LINK_SECRET          any long random string; signs the private links in emails
+  //   RESEND_API_KEY       from resend.com/api-keys (sending access, shopluckybears.com)
 }
