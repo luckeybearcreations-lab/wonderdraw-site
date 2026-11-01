@@ -19,6 +19,11 @@
 </head>
 <body>
   <p class="season-bar">🎄 For Christmas delivery, order by <strong>December 5</strong> — every package starts with a private proof.</p>
+  <a class="promo-banner" data-promo hidden href="#club">
+    <img src="/images/lucky-bear-logo-black-bg.jpg" alt="Luckey Bear Creations" width="56" height="56">
+    <span class="promo-text" data-promo-text>WonderDraw Club launch deal — first month $6 with code CLUB6. Ends Nov 30.</span>
+    <span class="promo-go">See the Club →</span>
+  </a>
   <header class="site-header">
     <a class="brand" href="/"><img src="/images/logo.jpg" alt="Luckey Bear Creations" width="48" height="42"><span>WonderDraw</span></a>
     <nav aria-label="Main">
@@ -107,7 +112,7 @@
           <a class="btn btn-primary" data-buy="bundle" href="/contact?topic=new-order&amp;package=bundle">Order the Bundle</a>
         </article>
       </div>
-      <article class="club">
+      <article class="club" id="club">
         <div>
           <h3>WonderDraw Club</h3>
           <p>One drawing turned into finished art every month, for families with a steady stream of masterpieces. AI-assisted and hand-reviewed, with a private proof first. Members save 20% on everything else — canvas and mug keepsakes and the Magic Reveal and Bundle packages. For Christmas, the usual December 5 order-by date applies. Cancel anytime.</p>
@@ -115,7 +120,7 @@
         </div>
         <div class="club-buy">
           <p class="price" data-price="club">$12/month</p>
-          <a class="btn btn-ghost" data-buy="club" href="/contact?topic=new-order&amp;package=club">Join the club</a>
+          <a class="btn btn-ghost" data-promo-button data-buy="club" href="/contact?topic=new-order&amp;package=club">Join the club</a>
         </div>
       </article>
     </section>
