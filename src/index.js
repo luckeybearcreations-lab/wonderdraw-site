@@ -10,7 +10,7 @@ export const PACKAGES = {
   plink_1UQjJNK5pTjjyr2KnCmamdKW: { key: "spark", name: "Spark Sketch", revisions: 0 },
   plink_1UQjJdK5pTjjyr2KFGhdcSj5: { key: "reveal", name: "Magic Reveal", revisions: 1 },
   plink_1UQjJyK5pTjjyr2K3FfN76N4: { key: "bundle", name: "Big Imagination Bundle", revisions: 2 },
-  plink_1UQjKHK5pTjjyr2K9yrToT17: { key: "club", name: "Little Artist Club", revisions: 1 },
+  plink_1UQjKHK5pTjjyr2K9yrToT17: { key: "club", name: "WonderDraw Club", revisions: 1 },
 };
 
 export const STYLES = {

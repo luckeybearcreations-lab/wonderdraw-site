@@ -12,7 +12,7 @@ visitors to the contact page to order by email, so the site works before Stripe 
 
 To make a Payment Link: Stripe Dashboard → Payment Links → New. Use a one-time price for
 Spark Sketch, Magic Reveal and Big Imagination Bundle, and a $12/month recurring price for
-Little Artist Club. Under **After payment**, choose "Don't show confirmation page" and
+WonderDraw Club. Under **After payment**, choose "Don't show confirmation page" and
 redirect to `https://wonderdraw.net/thanks`.
 
 ## Orders (automatic)
@@ -41,7 +41,7 @@ R2 `wonderdraw-orders`.
    `https://wonderdraw.shopluckybears.com/thanks?session_id={CHECKOUT_SESSION_ID}`
 6. `npm run deploy`
 
-Little Artist Club renewals don't get a new upload link yet; handle those by email.
+WonderDraw Club renewals don't get a new upload link yet; handle those by email.
 
 ## Contact email
 

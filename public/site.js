@@ -31,7 +31,7 @@
   var params = new URLSearchParams(location.search);
   var topic = params.get("topic");
   if (topic && form.topic.querySelector('option[value="' + topic + '"]')) form.topic.value = topic;
-  var names = { spark: "Spark Sketch", reveal: "Magic Reveal", bundle: "Big Imagination Bundle", club: "Little Artist Club" };
+  var names = { spark: "Spark Sketch", reveal: "Magic Reveal", bundle: "Big Imagination Bundle", club: "WonderDraw Club" };
   var wanted = names[params.get("package")];
   if (wanted && !form.message.value) form.message.value = "I'd like to order the " + wanted + ".";
 
