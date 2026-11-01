@@ -2,6 +2,18 @@
   var config = window.WONDERDRAW || { packages: {} };
   var packages = config.packages || {};
 
+  // --- temporary promotion: pure date check, auto-expires (config.js → promo.endsAt) ---
+  var promo = config.promo || null;
+  var promoLive = !!(promo && promo.endsAt && Date.now() < Date.parse(promo.endsAt));
+  if (promoLive) {
+    if (packages.club && promo.clubPrice) packages.club = Object.assign({}, packages.club, { price: promo.clubPrice });
+    document.documentElement.classList.add("promo-live");
+    document.querySelectorAll("[data-promo-text]").forEach(function (el) { el.textContent = promo.bannerText || ""; });
+    document.querySelectorAll("[data-promo-button]").forEach(function (el) { if (promo.clubButton) el.textContent = promo.clubButton; });
+  } else {
+    document.querySelectorAll("[data-promo]").forEach(function (el) { el.remove(); });
+  }
+
   document.querySelectorAll("[data-price]").forEach(function (el) {
     var item = packages[el.getAttribute("data-price")];
     if (item && item.price) {

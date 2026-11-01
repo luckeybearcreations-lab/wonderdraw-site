@@ -12,4 +12,13 @@ window.WONDERDRAW = {
     bundle: { price: "$79", link: "https://buy.stripe.com/5kQ28sgjadrP3uX0yM1sQ0s" },
     club: { price: "$12/month", link: "https://buy.stripe.com/8x2aEYc2UfzXghJ95i1sQ0t" },
   },
+  // Temporary promotion. Everything marked data-promo (banner, Club price swap, button text)
+  // renders only while the visitor's clock is before endsAt, then disappears on its own.
+  // endsAt = Mon Nov 30, 2026 11:59:59 PM Central = 2026-12-01T05:59:59Z (same instant the Stripe code CLUB6 expires).
+  promo: {
+    endsAt: "2026-12-01T05:59:59Z",
+    bannerText: "WonderDraw Club launch deal — first month $6 with code CLUB6. Ends Nov 30.",
+    clubPrice: "$6 first month, then $12/month",
+    clubButton: "$6 first month, then $12/month",
+  },
 };

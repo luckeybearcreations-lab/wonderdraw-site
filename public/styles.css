@@ -116,3 +116,15 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.2rem); }
 .reveal input[type=range] { position: absolute; left: 4%; right: 4%; bottom: 14px; width: 92%; }
 .reveal.watermarked::after { content: "WONDERDRAW PROOF  ·  WONDERDRAW PROOF  ·  WONDERDRAW PROOF"; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: clamp(1rem, 4vw, 2rem); color: rgba(255,255,255,.55); text-shadow: 0 0 4px rgba(0,0,0,.35); transform: rotate(-24deg); pointer-events: none; white-space: nowrap; }
 details summary { list-style: none; display: inline-block; }
+
+/* Temporary promo banner: shown only while config.promo.endsAt is in the future (see site.js) */
+.promo-banner[hidden] { display: none; }
+.promo-live .promo-banner { display: flex; }
+.promo-banner { align-items: center; gap: 14px; margin: 0; padding: 10px clamp(16px, 4vw, 48px); background: linear-gradient(90deg, #141816 0%, #221f19 55%, #141816 100%); color: #e8dfce; text-decoration: none; border-bottom: 3px solid #e3b76f; }
+.promo-banner img { width: 56px; height: 56px; border-radius: 12px; flex: none; }
+.promo-banner .promo-text { flex: 1 1 auto; font-weight: 800; font-size: 1.05rem; line-height: 1.3; color: #edc681; }
+.promo-banner .promo-go { flex: none; padding: 8px 16px; border-radius: 999px; background: #e3b76f; color: #141816; font-weight: 700; font-size: .95rem; }
+.promo-banner:hover .promo-go { background: #edc681; }
+.promo-live .club .price.is-set { font-size: 1.3rem; line-height: 1.25; }
+.promo-live .club .btn[data-promo-button] { font-size: .95rem; }
+@media (max-width: 640px) { .promo-banner { flex-wrap: wrap; } .promo-banner .promo-go { width: 100%; text-align: center; } }

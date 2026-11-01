@@ -63,3 +63,20 @@ test("every page links back to Gus' card with the home badge", async () => {
     assert.match(html, /<a class="gus-home-badge" href="https:\/\/www\.shopluckybears\.com\/gus" aria-label="Back to Gus' card" title="Back to Gus' card"><img src="\/home-badge\.webp" alt=""/, file);
   }
 });
+
+test("promo banner and Club price swap are data-promo and auto-expire Nov 30 2026 11:59:59 PM CT", async () => {
+  const html = await read("index.html");
+  const config = await read("config.js");
+  const js = await read("site.js");
+  assert.match(html, /<a class="promo-banner" data-promo hidden href="#club">/);
+  assert.match(html, /<article class="club" id="club">/);
+  assert.match(html, /data-promo-button data-buy="club"/);
+  assert.match(config, /bannerText: "WonderDraw Club launch deal — first month \$6 with code CLUB6\. Ends Nov 30\."/);
+  assert.match(config, /clubPrice: "\$6 first month, then \$12\/month"/);
+  const m = config.match(/endsAt: "([^"]+)"/);
+  assert.ok(m && !Number.isNaN(Date.parse(m[1])), "promo.endsAt missing or invalid");
+  assert.equal(m[1], "2026-12-01T05:59:59Z");
+  assert.match(js, /Date\.now\(\) < Date\.parse\(promo\.endsAt\)/);
+  assert.match(js, /\[data-promo\]"\)\.forEach\(function \(el\) \{ el\.remove\(\); \}\)/);
+  await access(new URL("images/lucky-bear-logo-black-bg.jpg", pub));
+});
