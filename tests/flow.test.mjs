@@ -147,3 +147,11 @@ test("prompt keeps the drawing and adds notes", () => {
   assert.match(p, /make it brighter/);
   assert.equal(esc('<a href="x">'), "&lt;a href=&quot;x&quot;&gt;");
 });
+
+test("plain http redirects to https", async () => {
+  const env = fakeEnv();
+  stubFetch([], env);
+  const res = await worker.fetch(new Request("http://wd.test/"), env, ctx());
+  assert.equal(res.status, 308);
+  assert.equal(res.headers.get("location"), "https://wd.test/");
+});

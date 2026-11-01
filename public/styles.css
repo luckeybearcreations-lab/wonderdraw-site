@@ -20,6 +20,9 @@ h1, h2, h3 { line-height: 1.2; margin: 0 0 .5em; }
 h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
 h2 { font-size: clamp(1.5rem, 3.5vw, 2.2rem); }
 
+.season-bar { margin: 0; padding: 10px 16px; text-align: center; background: var(--brand); color: var(--brand-ink); font-weight: 600; }
+.season-bar strong { color: var(--sun); }
+
 .site-header { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; padding: 14px clamp(16px, 4vw, 48px); background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.3rem; color: var(--ink); text-decoration: none; }
 .brand img { border-radius: 10px; }
