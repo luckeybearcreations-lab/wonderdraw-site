@@ -26,6 +26,12 @@ const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "ima
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Force HTTPS. The Worker runs first for every route (see wrangler.jsonc),
+    // so this covers the static pages too. Local dev stays on http.
+    if (url.protocol === "http:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 308);
+    }
     const path = url.pathname;
     try {
       if (path === "/api/order" && request.method === "POST") return await createOrder(request, env, ctx);
