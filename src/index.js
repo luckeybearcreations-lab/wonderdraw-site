@@ -23,8 +23,27 @@ export const STYLES = {
 const MAX_UPLOAD = 15 * 1024 * 1024;
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
+// Baseline security headers, added to every response the site sends.
+const SECURITY_HEADERS = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+};
+
 export default {
   async fetch(request, env, ctx) {
+    const res = await handle(request, env, ctx);
+    // Redirects and asset responses can have read-only headers, so copy first.
+    const out = new Response(res.body, res);
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) out.headers.set(name, value);
+    return out;
+  },
+};
+
+async function handle(request, env, ctx) {
+  {
     const url = new URL(request.url);
     // Force HTTPS. The Worker runs first for every route (see wrangler.jsonc),
     // so this covers the static pages too. Local dev stays on http.
@@ -50,8 +69,8 @@ export default {
       return page("Something went wrong", `<p>Sorry, something went wrong on our side. Please try again, or <a href="/contact?topic=existing-order">contact us</a>.</p>`, 500);
     }
     return env.ASSETS.fetch(request);
-  },
-};
+  }
+}
 
 // ---------- Stripe ----------
 
